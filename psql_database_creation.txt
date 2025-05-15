@@ -1,0 +1,70 @@
+DO $$
+BEGIN
+    IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name='orders') THEN
+        DROP TABLE orders CASCADE;
+    END IF;
+    IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name='reviews') THEN
+        DROP TABLE reviews CASCADE;
+    END IF;
+    IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name='promotions') THEN
+        DROP TABLE promotions CASCADE;
+    END IF;
+    IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name='users') THEN
+        DROP TABLE users CASCADE;
+    END IF;
+    IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name='products') THEN
+        DROP TABLE products CASCADE;
+    END IF;
+    IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name='seasons') THEN
+        DROP TABLE seasons CASCADE;
+    END IF;
+END$$;
+
+CREATE TABLE users (
+  id SERIAL PRIMARY KEY,
+  name TEXT,
+  age INT,
+  city TEXT,
+  signup_date DATE
+);
+
+CREATE TABLE products (
+  id SERIAL PRIMARY KEY,
+  name TEXT,
+  category TEXT,
+  price NUMERIC,
+  brand TEXT,
+  rating NUMERIC
+);
+
+CREATE TABLE seasons (
+  id SERIAL PRIMARY KEY,
+  name TEXT,
+  start_date DATE,
+  end_date DATE
+);
+
+CREATE TABLE promotions (
+  id SERIAL PRIMARY KEY,
+  product_id INT REFERENCES products(id),
+  season_id INT REFERENCES seasons(id),
+  discount_percent NUMERIC
+);
+
+CREATE TABLE orders (
+  id SERIAL PRIMARY KEY,
+  user_id INT REFERENCES users(id),
+  product_id INT REFERENCES products(id),
+  order_date DATE,
+  status TEXT,
+  quantity INT
+);
+
+CREATE TABLE reviews (
+  id SERIAL PRIMARY KEY,
+  user_id INT REFERENCES users(id),
+  product_id INT REFERENCES products(id),
+  rating NUMERIC,
+  review_date DATE,
+  text TEXT
+);
