@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>RL Cache Simulation Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --text-primary: #e2e8f0;
+            --text-secondary: #94a3b8;
+            --accent-primary: #3b82f6;
+            --accent-secondary: #60a5fa;
+            --success: #22c55e;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --border-color: #334155;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            transition: all 0.2s ease-in-out;
+        }
+
+        body { 
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container { 
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+            animation: fadeIn 0.5s ease-out;
+            padding: 2rem;
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(45deg, var(--accent-primary), var(--accent-secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            letter-spacing: -0.02em;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 1rem 2rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            background: var(--accent-primary);
+            color: white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
+            background: var(--accent-secondary);
+        }
+
+        .btn:disabled {
+            background: var(--border-color);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .columns {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 2rem;
+            width: 100%;
+            margin-bottom: 3rem;
+        }
+
+        .column {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            animation: slideUp 0.5s ease-out;
+            border: 1px solid var(--border-color);
+        }
+
+        .log-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--accent-primary);
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 2px solid var(--border-color);
+            letter-spacing: 0.5px;
+        }
+
+        .log-box {
+            height: 450px;
+            overflow-y: auto;
+            background: var(--bg-primary);
+            color: var(--text-secondary);
+            font-family: 'Consolas', monospace;
+            font-size: 0.95rem;
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid var(--border-color);
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .log-box::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .log-box::-webkit-scrollbar-track {
+            background: var(--bg-primary);
+        }
+
+        .log-box::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 4px;
+        }
+
+        .log-box::-webkit-scrollbar-thumb:hover {
+            background: var(--accent-primary);
+        }
+
+        .plot-container {
+            width: 100%;
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 3rem;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            animation: slideUp 0.5s ease-out;
+            border: 1px solid var(--border-color);
+        }
+
+        #finalSummary {
+            width: 100%;
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 2rem;
+            font-family: 'Inter', sans-serif;
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            animation: slideUp 0.5s ease-out;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        }
+
+        #finalSummary .section-title {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--accent-primary);
+            margin: 2rem 0 1.5rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 2px solid var(--border-color);
+            letter-spacing: 0.5px;
+        }
+
+        #finalSummary .comparison {
+            background: var(--bg-primary);
+            padding: 2rem;
+            border-radius: 12px;
+            margin: 1.5rem 0;
+            border: 1px solid var(--border-color);
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        #finalSummary .query-stats {
+            margin: 0.5rem 0;
+            
+        }
+
+        @keyframes fadeIn {
+            from { 
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .log-entry {
+            animation: fadeIn 0.3s ease-out;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid rgba(51, 65, 85, 0.2);
+        }
+
+        .log-entry:hover {
+            color: var(--text-primary);
+            background: rgba(59, 130, 246, 0.1);
+            border-radius: 4px;
+            padding: 0.5rem;
+            margin: 0 -0.5rem;
+        }
+
+        /* Chart.js customization */
+        canvas {
+            background: var(--bg-primary);
+            border-radius: 8px;
+            padding: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>RL Cache Simulation Dashboard</h1>
+        </div>
+        <div class="button-group">
+            <button class="btn" id="startBtn">Start Simulation</button>
+        </div>
+        <div class="columns">
+            <div class="column">
+                <div class="log-title">No Cache</div>
+                <div class="log-box" id="logNoCache"></div>
+            </div>
+            <div class="column">
+                <div class="log-title">With RL Cache</div>
+                <div class="log-box" id="logCache"></div>
+            </div>
+        </div>
+        <div class="plot-container">
+            <canvas id="livePlot" height="100"></canvas>
+        </div>
+        <div style="width: 100%; display: flex; justify-content: center; margin-bottom: 2rem;">
+            <button class="btn" id="getSummaryBtn">Get Summary</button>
+        </div>
+        <div id="finalSummary"></div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const logNoCache = document.getElementById('logNoCache');
+        const logCache = document.getElementById('logCache');
+        const startBtn = document.getElementById('startBtn');
+        let plotChart;
+        let plotDataNoCache = [];
+        let plotDataCache = [];
+        let plotLabels = [];
+
+        function appendLog(logBox, msg) {
+            if (msg.startsWith('__summary__')) {
+                document.getElementById('finalSummary').textContent = msg.replace('__summary__', '');
+                return;
+            }
+            msg.split('\n').forEach(line => {
+                if (line.trim() !== '') {
+                    const div = document.createElement('div');
+                    div.className = 'log-entry';
+                    div.textContent = line;
+                    logBox.appendChild(div);
+                }
+            });
+            logBox.scrollTop = logBox.scrollHeight;
+        }
+
+        function setupPlot() {
+            const ctx = document.getElementById('livePlot').getContext('2d');
+            Chart.defaults.color = '#94a3b8';
+            Chart.defaults.borderColor = '#334155';
+            plotChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [
+                        {
+                            label: 'No Cache',
+                            data: [],
+                            borderColor: '#ef4444',
+                            backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                            fill: false,
+                            tension: 0.4
+                        },
+                        {
+                            label: 'With RL Cache',
+                            data: [],
+                            borderColor: '#22c55e',
+                            backgroundColor: 'rgba(34, 197, 94, 0.1)',
+                            fill: false,
+                            tension: 0.4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    animation: {
+                        duration: 750,
+                        easing: 'easeInOutQuart'
+                    },
+                    interaction: {
+                        intersect: false,
+                        mode: 'index'
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                padding: 20,
+                                usePointStyle: true
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(30, 41, 59, 0.9)',
+                            padding: 12,
+                            titleColor: '#e2e8f0',
+                            bodyColor: '#94a3b8',
+                            borderColor: '#334155',
+                            borderWidth: 1
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                color: '#334155'
+                            },
+                            title: {
+                                display: true,
+                                text: 'Queries Completed',
+                                color: '#94a3b8'
+                            }
+                        },
+                        y: {
+                            grid: {
+                                color: '#334155'
+                            },
+                            title: {
+                                display: true,
+                                text: 'Avg Time (ms, per 10 queries)',
+                                color: '#94a3b8'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function updatePlot(label, step, avg_time) {
+            if (!plotLabels.includes(step)) {
+                plotLabels.push(step);
+                plotChart.data.labels.push(step);
+            }
+            if (label.includes('Without Cache')) {
+                plotDataNoCache.push(avg_time);
+                plotChart.data.datasets[0].data = plotDataNoCache;
+            } else {
+                plotDataCache.push(avg_time);
+                plotChart.data.datasets[1].data = plotDataCache;
+            }
+            plotChart.update('none');
+        }
+
+        function startStreams() {
+            // No Cache log
+            const evtNoCache = new EventSource('/stream/nocache');
+            evtNoCache.onmessage = function(event) {
+                const data = JSON.parse(event.data.replace(/'/g, '\"'));
+                if (data.avg_time !== undefined) {
+                    appendLog(logNoCache, `[${data.step}] Avg: ${data.avg_time.toFixed(2)} ms | DB hits: ${data.db_hits}`);
+                    updatePlot(data.label, data.step, data.avg_time);
+                }
+            };
+            // RL Cache log
+            const evtCache = new EventSource('/stream/cache');
+            evtCache.onmessage = function(event) {
+                const data = JSON.parse(event.data.replace(/'/g, '\"'));
+                if (data.avg_time !== undefined) {
+                    appendLog(logCache, `[${data.step}] Avg: ${data.avg_time.toFixed(2)} ms | Mem: ${data.mem_hits} Redis: ${data.redis_hits} DB: ${data.db_hits}`);
+                    updatePlot(data.label, data.step, data.avg_time);
+                }
+            };
+        }
+
+        startBtn.onclick = function() {
+            startBtn.disabled = true;
+            fetch('/start', { method: 'POST' })
+                .then(() => {
+                    setupPlot();
+                    startStreams();
+                    startSummaryStream();
+                });
+        };
+
+        document.getElementById('getSummaryBtn').onclick = function() {
+            fetch('/summary')
+                .then(response => response.text())
+                .then(text => {
+                    // Replace literal \n with actual newlines
+                    text = text.replace(/\\n/g, '\n');
+
+                    // Split the summary into sections (double newlines separate sections)
+                    const sections = text.split('\n\n');
+                    let formattedHtml = '';
+
+                    sections.forEach(section => {
+                        if (section.trim()) {
+                            if (section.includes('---')) {
+                                // Section title
+                                formattedHtml += `<div class="section-title">${section.replace(/---/g, '').trim()}</div>`;
+                            } else {
+                                // Split section into lines
+                                const lines = section.split('\n').filter(line => line.trim() !== '');
+                                if (lines.length > 0) {
+                                    lines.forEach(line => {
+                                        let className = '';
+                                        if (line.includes('Performance Comparison')) {
+                                            className = 'comparison';
+                                        } else if (line.includes('Per-query type improvement')) {
+                                            className = 'section';
+                                        } else if (line.includes('queries, avg time')) {
+                                            className = 'query-stats';
+                                        }
+                                        formattedHtml += `<div class="${className}">${line.trim()}</div>`;
+                                    });
+                                }
+                            }
+                        }
+                    });
+
+                    document.getElementById('finalSummary').innerHTML = formattedHtml;
+                });
+        };
+
+    </script>
+</body>
+</html>
