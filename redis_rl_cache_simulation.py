@@ -212,9 +212,9 @@ def synthetic_query_distribution():
 def run_simulation(with_cache=True, log_queue=None, plot_queue=None):
     conn = psycopg2.connect(
         dbname='postgres',
-        user='postgres.meovktsopddvfomvpxcx',
-        password='dbms',
-        host='aws-0-us-east-2.pooler.supabase.com',
+        user='*******,
+        password='*****',
+        host='***********',
         port=5432
     )
     cur = conn.cursor()
