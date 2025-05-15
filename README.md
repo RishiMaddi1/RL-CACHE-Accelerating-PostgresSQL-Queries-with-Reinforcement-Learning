@@ -54,18 +54,5 @@ This project demonstrates the use of a multi-level cache system to accelerate Po
 - **Database Connection**: Update the database connection details in `redis_rl_cache_simulation.py` if necessary.
 - **Simulation Parameters**: You can adjust the simulation parameters in `redis_rl_cache_simulation.py` to test different scenarios.
 
-## License
 
-Copyright © 2025  
-All rights reserved. Maddi Rishi Dhaneswar
-
-This software and its associated documentation are proprietary and confidential.  
-Unauthorized use, reproduction, distribution, or modification of any part of this codebase is strictly prohibited without explicit written permission from the owner (Maddi Rishi Dhaneswar).
-
-This repository is shared for academic evaluation and publication purposes only.
-
-If you wish to collaborate, request access, or seek clarification, please contact:  
-maddi.rishi2468@gmail.com
-
-No license is granted by implication, estoppel, or otherwise.
 
